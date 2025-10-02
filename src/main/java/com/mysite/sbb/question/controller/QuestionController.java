@@ -1,17 +1,17 @@
 package com.mysite.sbb.question.controller;
 
+import com.mysite.sbb.question.dto.QuestionDto;
 import com.mysite.sbb.question.entity.Question;
 import com.mysite.sbb.question.repository.QuestionRepository;
 import com.mysite.sbb.question.service.QuestionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -38,4 +38,30 @@ public class QuestionController {
         log.info("question : {}", question);
         return "question/detail";
     }
+
+    @GetMapping("/create")
+    public String createForm(QuestionDto questionDto, Model model){
+        model.addAttribute("questionDto", questionDto);
+        return "question/inputForm";
+    }
+
+    @PostMapping("/create")
+    public String create(@Valid QuestionDto questionDto,
+                         BindingResult bindingResult,
+                         Model model){
+
+        if(bindingResult.hasErrors()){
+            model.addAttribute("questionDto", questionDto);
+            return "question/inputForm";
+        }
+
+        Question question = Question.builder()
+                .content(questionDto.getContent())
+                .subject(questionDto.getSubject())
+                .build();
+        questionService.create(question);
+
+        return "redirect:/question/list";
+    }
+
 }

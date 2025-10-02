@@ -32,4 +32,8 @@ public class QuestionService {
 //            throw new EntityNotFoundException("해당 질문 X");
 //        }
     }
+
+    public void create(Question question) {
+        questionRepository.save(question);
+    }
 }
