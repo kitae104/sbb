@@ -1,9 +1,13 @@
 package com.mysite.sbb.question.service;
 
+import com.mysite.sbb.question.dto.QuestionDto;
 import com.mysite.sbb.question.entity.Question;
 import com.mysite.sbb.question.repository.QuestionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,8 +19,9 @@ public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
-    public List<Question> getQuestionList() {
-        return questionRepository.findAll();
+    public Page<Question> getQuestionList(int page) {
+        Pageable pageable = PageRequest.of(page, 10);
+        return questionRepository.findAll(pageable);
     }
 
     public Question getQuestion(Long id) {
@@ -33,7 +38,12 @@ public class QuestionService {
 //        }
     }
 
-    public void create(Question question) {
+    public void create(QuestionDto questionDto) {
+        Question question = Question.builder()
+                .content(questionDto.getContent())
+                .subject(questionDto.getSubject())
+                .build();
+
         questionRepository.save(question);
     }
 }
