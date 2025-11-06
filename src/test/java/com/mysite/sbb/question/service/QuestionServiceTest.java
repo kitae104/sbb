@@ -24,7 +24,7 @@ class QuestionServiceTest {
                     .build();
             questionService.create(questionDto);
         }
-        System.out.println("전체 갯수 : " + questionService.getQuestionList().size());
+//        System.out.println("전체 갯수 : " + questionService.getQuestionList().size());
 
 
     }
