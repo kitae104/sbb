@@ -1,5 +1,6 @@
 package com.mysite.sbb.member.entity;
 
+import com.mysite.sbb.member.constant.Department;
 import com.mysite.sbb.member.constant.Gender;
 import jakarta.persistence.*;
 import lombok.*;
@@ -36,7 +37,7 @@ public class Member {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String department; // 학과
+    private Department department; // 학과
 
     @Column(nullable = false)
     private Boolean active; // 등록 여부
