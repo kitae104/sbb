@@ -1,5 +1,7 @@
 package com.mysite.sbb.question.controller;
 
+import com.mysite.sbb.member.entity.Member;
+import com.mysite.sbb.member.service.MemberService;
 import com.mysite.sbb.question.dto.QuestionDto;
 import com.mysite.sbb.question.entity.Question;
 import com.mysite.sbb.question.service.QuestionService;
@@ -7,10 +9,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.security.Principal;
 
 @Controller
 @RequestMapping(value = "/question")
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final MemberService memberService;
 
     @GetMapping("/list")
     public String list(Model model,
@@ -44,9 +50,11 @@ public class QuestionController {
         return "question/inputForm";
     }
 
+    @PreAuthorize("isAuthenticated()") // 로그인 이후 사용
     @PostMapping("/create")
     public String create(@Valid QuestionDto questionDto,
                          BindingResult bindingResult,
+                         Principal principal,
                          Model model){
 
         if(bindingResult.hasErrors()){
@@ -54,8 +62,10 @@ public class QuestionController {
             return "question/inputForm";
         }
 
+        log.info("========= 로그인 사용자 : {}" ,principal.getName());
+        Member member = memberService.getMember(principal.getName());
 
-        questionService.create(questionDto);
+        questionService.create(questionDto, member);
 
         return "redirect:/question/list";
     }
