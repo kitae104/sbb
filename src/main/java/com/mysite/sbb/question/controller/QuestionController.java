@@ -29,6 +29,20 @@ public class QuestionController {
     private final MemberService memberService;
 
     @PreAuthorize("isAuthenticated()")
+    @GetMapping("/delete/{id}")
+    public String delete(@PathVariable("id") Long id, Principal principal){
+
+        Question question = questionService.getQuestion(id);
+        if(!question.getAuthor().getUsername().equals(principal.getName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        questionService.delete(question);
+
+        return "redirect:/question/list";
+    }
+
+
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/modify/{id}")
     public String modify(@PathVariable("id") Long id,
                          @Valid QuestionDto questionDto,

@@ -59,4 +59,8 @@ public class QuestionService {
         question.setContent(questionDto.getContent());
         questionRepository.save(question); // update
     }
+
+    public void delete(Question question) {
+        questionRepository.delete(question);
+    }
 }
