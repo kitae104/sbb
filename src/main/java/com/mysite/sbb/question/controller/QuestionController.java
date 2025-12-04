@@ -9,11 +9,13 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.security.Principal;
 
@@ -26,6 +28,42 @@ public class QuestionController {
     private final QuestionService questionService;
     private final MemberService memberService;
 
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/modify/{id}")
+    public String modify(@PathVariable("id") Long id,
+                         @Valid QuestionDto questionDto,
+                         BindingResult bindingResult,
+                         Principal principal) {
+        if(bindingResult.hasErrors()) {
+            return "question/inputForm";
+        }
+        Question question = questionService.getQuestion(id);
+
+        if(!question.getAuthor().getUsername().equals(principal.getName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        questionService.modify(question, questionDto);
+        return "redirect:/question/detail/" + id;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/modify/{id}")
+    public String modify(@PathVariable("id") Long id, Model model,
+                         Principal principal){
+        log.info("============== principal : {}", principal.getName());
+        Question question = questionService.getQuestion(id);
+
+        if(!question.getAuthor().getUsername().equals(principal.getName())){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+
+        QuestionDto questionDto = new QuestionDto();
+        questionDto.setSubject(question.getSubject());
+        questionDto.setContent(question.getContent());
+        model.addAttribute("questionDto", questionDto);
+        return "question/inputForm";
+    }
+    // /list?page=0
     @GetMapping("/list")
     public String list(Model model,
                        @RequestParam(value="page", defaultValue = "0") int page){

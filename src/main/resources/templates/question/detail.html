@@ -19,7 +19,7 @@
             </div>
             <!-- 수정 / 삭제  -->
             <div class="my-3">
-                <a href="#"
+                <a th:href="@{|/question/modify/${question.id}|}"
                    class="btn btn-sm btn-outline-primary"
                    sec:authorize="isAuthenticated()"
                    th:if="${question.author != null and
@@ -27,8 +27,9 @@
                 >
                     수정
                 </a>
-                <a href="#"
-                   class="btn btn-sm btn-outline-danger"
+                <a href="javascript:void(0)"
+                   th:data-uri="@{|/qeuestion/delete/${question.id}|}"
+                   class="delete btn btn-sm btn-outline-danger"
                    sec:authorize="isAuthenticated()"
                    th:if="${question.author != null and
                             #authentication.getPrincipal().getUsername() == question.author.username}"
@@ -81,4 +82,17 @@
         <input class="btn btn-primary my-3" type="submit" value="답변 등록">
     </form>
 </div>
+<th:block layout:fragment="script">
+    <script type="text/javascript">
+        $(document).ready(function() {
+           $(".delete").click(function() {
+               if(confirm("정말 삭제할까요?")){
+                   const uri = $(this).data('uri');
+                   window.location.href = uri;
+               }
+           })
+        });
+    </script>
+
+</th:block>
 </html>
